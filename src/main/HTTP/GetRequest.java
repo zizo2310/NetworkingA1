@@ -24,6 +24,7 @@ public class GetRequest extends HRequest{
     }
 
     public GetRequest(URL url) {
+
         super(METHOD_NAME, url);
     }
 
