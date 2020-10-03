@@ -51,6 +51,7 @@ public abstract class HRequest extends HMessage {
     }
 
     public abstract List<String> getOutput();
+    protected abstract String getTheHost();
 
     protected String getStartOfLine() {
         return String.format("%s %s %s", this.method.toUpperCase(), getRequestPathWithQueryParams(), this.HTTP_VERSION);
