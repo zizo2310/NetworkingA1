@@ -1,43 +1,58 @@
 package main.HTTP;
 
-import java.io.File;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.net.InetAddress;
 import java.net.MalformedURLException;
-import java.net.Socket;
 import java.net.URL;
-import java.util.Map;
 
 public class httpc {
     public static void main(String[] args) {
         if(args.length > 0){
             String command = args[0].toLowerCase();
+            boolean errorOccurred;
             try {
                 switch (command) {
                     case "get":
                         URL url = new URL(args[args.length - 1]);
                         GetRequest getRequest = new GetRequest(url);
-                        Parse(getRequest, args);
-                        CreateConnection(getRequest);
+                        errorOccurred = getRequest.Parse(args);
+                        if(errorOccurred){
+                            Help();
+                            System.exit(0);
+                        }
+                        Response response = new Response(getRequest);
+                        System.out.println(response.getMessage());
                         /*URL url = new URL(args[args.length - 1]);
                         if(url.getQuery()==null) {
                             GetRequest getRequest = new GetRequest(url);
-                            Parse(getRequest, args);
-                            CreateConnection(getRequest);
+                            errorOccurred = getRequest.Parse(args);
+                            if(errorOccurred){
+                                Help();
+                                System.exit(0);
+                            }
+                            Response response = new Response(getRequest);
+                            System.out.println(response.getMessage());
                         }
                         else{
                             PostRequest postRequest = new PostRequest(url);
-                            Parse(postRequest, args);
+                            errorOccurred = getRequest.Parse(args);
+                            if(errorOccurred){
+                                Help();
+                                System.exit(0);
+                            }
                             postRequest.withData(url.getQuery());
-                            CreateConnection(postRequest);
+                            Response response = new Response(postRequest);
+                            System.out.println(response.getMessage());
                         }*/
                         break;
                     case "post":
                         URL url2 = new URL(args[args.length - 1]);
                         PostRequest postRequest = new PostRequest(url2);
-                        Parse(postRequest, args);
-                        CreateConnection(postRequest);
+                        errorOccurred = postRequest.Parse(args);
+                        if(errorOccurred){
+                            Help();
+                            System.exit(0);
+                        }
+                        Response response2 = new Response(postRequest);
+                        System.out.println(response2.getMessage());
                         break;
                     case "help":
                         //Prints the help information for the command
@@ -66,111 +81,7 @@ public class httpc {
         }
     }
 
-    public static void Parse(HRequest request, String[] args){
-        for(int i = 1; i < args.length-1; i++){
-            switch(args[i]){
-                case "-v":
-                    request.verboseEnabled = true;
-                    break;
-                case "-h":
-                    String [] header = args[i + 1].split(":");
-                    if (header.length == 2 && (i+1)!=args.length-1) {
-                        request.header.put(header[0], header[1]);
-                        i++;
-                    }
-                    else{
-                        Help();
-                        System.exit(0);
-                    }
-                    break;
-                case "-d":
-                    if(request.emptyBody) {
-                        if (request instanceof PostRequest) {
-                            if ((i+1)!=args.length-1) {
-                                request.withData(args[i + 1]);
-                            }
-                            request.emptyBody = false;
-                            i++;
-                        }
-                        else {
-                            Help();
-                            System.exit(0);
-                        }
-                    }
-                    //Multiple instances of -d or -f options
-                    else{
-                        Help();
-                        System.exit(0);
-                    }
-                    break;
-                case "-f":
-                    if(request.emptyBody) {
-                        if(request instanceof PostRequest) {
-                            if((i+1)!=args.length){
-                                File file= new File("src\\main\\HTTP\\"+args[i+1]);
-                                request.withFile(file);
-                            }
-                            request.emptyBody = false;
-                            i++;
-                        }
-                        else{
-                            Help();
-                            System.exit(0);
-                        }
-                    }
-                    //Multiple instances of -d or -f options
-                    else{
-                        Help();
-                        System.exit(0);
-                    }
-                    break;
-            }
-        }
-    }
-
-    public static void CreateConnection(HRequest request){
-        try{
-            InetAddress web = InetAddress.getByName(request.url.getHost());
-            Socket socket = new Socket(web, 80);
-            OutputStreamWriter outputWriter = new OutputStreamWriter(socket.getOutputStream());
-            InputStreamReader inputReader = new InputStreamReader(socket.getInputStream());
-            String strMessage = "";
-
-            String requestMessage = request.method + " " + request.url + " " + request.HTTP_VERSION;
-            for(int i =0; i < request.getHeaders().size(); i++){
-                requestMessage+="\r\n" + request.getHeaders().get(i);
-            }
-            requestMessage+= "\r\n\r\n";
-            if(request.data!=null){
-                requestMessage+= request.data;
-            }
-            outputWriter.write(requestMessage);
-            outputWriter.flush();
-            int message = inputReader.read();
-            while(inputReader.ready()){
-                strMessage+=(char) message;
-                message = inputReader.read();
-            }
-            if(!request.verboseEnabled){
-                String [] strArray = strMessage.split("\r\n\r\n");
-                for(int i =1; i < strArray.length; i++) {
-                    System.out.println(strArray[i]);
-                }
-            }
-            else {
-                System.out.println(strMessage);
-            }
-            inputReader.close();
-            outputWriter.close();
-            socket.close();
-        }
-        catch(Exception e){
-            System.out.println("Error");
-        }
-    }
-
     public static void Help(){
-        //Print help message directly or read from a file
         System.out.println("\nhttpc is a curl-like application but supports HTTP protocol only.\n");
         System.out.println("Usage:");
         System.out.println("\thttpc command [arguments]");

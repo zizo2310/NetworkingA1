@@ -27,11 +27,6 @@ public abstract class HRequest {
         this.emptyBody = true;
     }
 
-    public HRequest withHeaders(Map<String, String> headers) {
-        this.header = headers;
-        return this;
-    }
-
     public HRequest withData(String data) {
         this.data = data;
         this.addContentLengthToHeaders();
@@ -61,16 +56,12 @@ public abstract class HRequest {
     }
 
     private void addContentLengthToHeaders() {
-
         //Not sure if it should be long will decide later
         long contentLength = 0;
 
         if (this.data != null) {
             contentLength = this.data.getBytes().length;
         }
-        /*else if (this.file != null) {
-            contentLength = this.file.getTotalSpace();
-        }*/
         this.header.put("Content-Length", Long.toString(contentLength));
     }
 
