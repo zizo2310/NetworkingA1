@@ -30,12 +30,14 @@ public abstract class HRequest {
     public HRequest withData(String data) {
         this.data = data;
         this.addContentLengthToHeaders();
+        this.emptyBody = false;
         return this;
     }
 
     public HRequest withFile(File file) {
         this.data = GetDataFromFile(file);
         this.addContentLengthToHeaders();
+        this.emptyBody = false;
         return this;
     }
 

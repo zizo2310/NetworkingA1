@@ -12,15 +12,6 @@ public class httpc {
                 switch (command) {
                     case "get":
                         URL url = new URL(args[args.length - 1]);
-                        GetRequest getRequest = new GetRequest(url);
-                        errorOccurred = getRequest.Parse(args);
-                        if(errorOccurred){
-                            Help();
-                            System.exit(0);
-                        }
-                        Response response = new Response(getRequest);
-                        System.out.println(response.getMessage());
-                        /*URL url = new URL(args[args.length - 1]);
                         if(url.getQuery()==null) {
                             GetRequest getRequest = new GetRequest(url);
                             errorOccurred = getRequest.Parse(args);
@@ -33,7 +24,7 @@ public class httpc {
                         }
                         else{
                             PostRequest postRequest = new PostRequest(url);
-                            errorOccurred = getRequest.Parse(args);
+                            errorOccurred = postRequest.Parse(args);
                             if(errorOccurred){
                                 Help();
                                 System.exit(0);
@@ -41,7 +32,7 @@ public class httpc {
                             postRequest.withData(url.getQuery());
                             Response response = new Response(postRequest);
                             System.out.println(response.getMessage());
-                        }*/
+                        }
                         break;
                     case "post":
                         URL url2 = new URL(args[args.length - 1]);

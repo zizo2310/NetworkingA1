@@ -18,7 +18,7 @@ public class GetRequest extends HRequest{
                     this.verboseEnabled = true;
                     break;
                 case "-h":
-                    String [] header = args[i + 1].split(":");
+                    String[] header = args[i + 1].split(":");
                     if (header.length == 2 && (i+1)!=args.length-1) {
                         this.header.put(header[0], header[1]);
                         i++;
@@ -32,6 +32,7 @@ public class GetRequest extends HRequest{
                     break;
             }
         }
+
         return errorOccurred;
     }
 }

@@ -1,6 +1,7 @@
 package main.HTTP;
 
 import java.io.File;
+import java.io.FileWriter;
 import java.net.URL;
 
 public class PostRequest extends HRequest {
@@ -14,6 +15,7 @@ public class PostRequest extends HRequest {
 
     public boolean Parse(String[] args){
         boolean errorOccurred = false;
+        File outputFile = null;
         for(int i = 1; i < args.length-1; i++){
             switch(args[i]){
                 case "-v":
@@ -34,9 +36,11 @@ public class PostRequest extends HRequest {
                     if(this.emptyBody) {
                         if ((i+1)!=args.length-1) {
                             this.withData(args[i + 1]);
+                            i++;
                         }
-                        this.emptyBody = false;
-                        i++;
+                        else{
+                            errorOccurred = true;
+                        }
                     }
                     //Multiple instances of -d or -f options
                     else{
@@ -45,14 +49,25 @@ public class PostRequest extends HRequest {
                     break;
                 case "-f":
                     if(this.emptyBody) {
-                        if((i+1)!=args.length){
+                        if((i+1)!=args.length-1){
                             File file= new File("src\\main\\HTTP\\"+args[i+1]);
                             this.withFile(file);
+                            i++;
                         }
-                        this.emptyBody = false;
-                        i++;
+                        else{
+                            errorOccurred = true;
+                        }
                     }
                     //Multiple instances of -d or -f options
+                    else{
+                        errorOccurred = true;
+                    }
+                    break;
+                case "-o":
+                    if((i+1)!=args.length-1){
+                        outputFile = new File("src\\main\\HTTP\\"+args[i+1]);
+                        i++;
+                    }
                     else{
                         errorOccurred = true;
                     }
@@ -62,6 +77,21 @@ public class PostRequest extends HRequest {
                     break;
             }
         }
+        if(outputFile!=null && this.data!=null){
+            try{
+            WriteInOutputFile(outputFile, data);
+            }
+            catch(Exception e){
+                System.out.println(e.getMessage());
+            }
+        }
+
         return errorOccurred;
+    }
+
+    public void WriteInOutputFile(File file, String data) throws Exception{
+        FileWriter fileWriter = new FileWriter(file);
+        fileWriter.write(data);
+        fileWriter.close();
     }
 }
