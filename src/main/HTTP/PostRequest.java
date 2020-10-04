@@ -14,24 +14,4 @@ public class PostRequest extends HRequest {
         super(HTTP_METHOD, url);
     }
 
-    protected String getTheHost() {
-        return String.format("Host: %s", this.url.getHost());
-    }
-
-    public List<String> getOutput() {
-        List<String> lines = new ArrayList<String>();
-        lines.add(this.getStartOfLine());
-        lines.add(this.getTheHost());
-        lines.addAll(this.getHeaders());
-        lines.add("");
-        if (this.data != null) {
-            System.out.println(this.data);
-            lines.add(this.data);
-        }
-
-        return lines
-                .stream()
-                .map(line -> line + "\r\n")
-                .collect(Collectors.toList());
-    }
 }
