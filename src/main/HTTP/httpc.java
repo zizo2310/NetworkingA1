@@ -66,7 +66,6 @@ public class httpc {
                         break;
                     default:
                         System.out.println("Invalid command. Use 'httpc help' for more information");
-                        break;
                 }
             }
             catch(MalformedURLException e) {
